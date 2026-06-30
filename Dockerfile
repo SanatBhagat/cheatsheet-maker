@@ -1,10 +1,7 @@
-# Use the official, standard Debian-based Python image
-FROM python:3.10-slim
+FROM nikolaik/python-nodejs:python3.10-nodejs20-slim
 
-# Install Node.js, npm, and the WeasyPrint PDF layout dependencies as root
-RUN apt-get update && apt-get install -y \
-    nodejs \
-    npm \
+# Install system dependencies required for canvas/graphics
+RUN apt-get update --fix-missing && apt-get install -y \
     build-essential \
     libcairo2 \
     libpango-1.0-0 \
@@ -14,18 +11,18 @@ RUN apt-get update && apt-get install -y \
     shared-mime-info \
     && rm -rf /var/lib/apt/lists/*
 
-# Set up the working directory
+# Set up the main app directory
 WORKDIR /app
 
-# Copy your code into the container
+# Copy the source code
 COPY backend/ ./backend/
 COPY frontend/ ./frontend/
 
-# Install the Python and Node packages
+# Move into the backend directory to install dependencies
 WORKDIR /app/backend
 RUN pip install --no-cache-dir -r requirements.txt
 RUN npm install
 
-# Open the port and run the server
+# Expose the port and start the server
 EXPOSE 5000
 CMD ["node", "server.js"]
