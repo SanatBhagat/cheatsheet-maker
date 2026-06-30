@@ -2,7 +2,7 @@ import sys
 import os
 import fitz 
 from weasyprint import HTML, CSS
-from google import genai
+import google.generativeai as genai
 
 def extract_text(pdf_path):
     try:
