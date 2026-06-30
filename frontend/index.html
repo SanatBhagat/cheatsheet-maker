@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Micro-Cheatsheet Generator</title>
+    <style>
+        body { font-family: sans-serif; background: #121214; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { background: #1a1a1e; padding: 2rem; border-radius: 12px; text-align: center; max-width: 400px; width: 100%; }
+        .dropzone { border: 2px dashed #3f3f46; padding: 2rem; border-radius: 8px; cursor: pointer; margin: 1rem 0; }
+        input[type="file"] { display: none; }
+        button { background: #6366f1; color: white; border: none; padding: 1rem; width: 100%; border-radius: 6px; cursor: pointer; }
+        .status { margin-top: 1rem; color: #6366f1; display: none; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Micro-Cheatsheet Maker</h2>
+    <form id="form">
+        <div class="dropzone" onclick="document.getElementById('file').click()">
+            <span id="label">Click to select PDF</span>
+            <input type="file" id="file" accept="application/pdf" required>
+        </div>
+        <button type="submit" id="btn">Generate PDF</button>
+    </form>
+    <div id="status" class="status">Processing...</div>
+</div>
+<script>
+    const file = document.getElementById('file');
+    const label = document.getElementById('label');
+    const btn = document.getElementById('btn');
+    const status = document.getElementById('status');
+
+    file.onchange = () => label.textContent = file.files[0].name;
+
+    document.getElementById('form').onsubmit = async (e) => {
+        e.preventDefault();
+        btn.disabled = true;
+        status.style.display = 'block';
+        status.textContent = 'Processing PDF (this takes a minute)...';
+        status.style.color = '#6366f1';
+
+        const formData = new FormData();
+        formData.append('pdf', file.files[0]);
+
+        try {
+            const res = await fetch('/api/generate', { method: 'POST', body: formData });
+            if (!res.ok) throw new Error('Generation failed');
+            const blob = await res.blob();
+            const a = document.createElement('a');
+            a.href = window.URL.createObjectURL(blob);
+            a.download = "cheatsheet.pdf";
+            a.click();
+            status.textContent = 'Success! Downloaded.';
+            status.style.color = '#10b981';
+        } catch (err) {
+            status.textContent = 'Error processing file.';
+            status.style.color = '#ef4444';
+        }
+        btn.disabled = false;
+    };
+</script>
+</body>
+</html>
