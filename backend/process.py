@@ -21,28 +21,27 @@ def condense_with_ai(text):
         print("Error: GEMINI_API_KEY not set.", file=sys.stderr)
         sys.exit(1)
         
-    client = genai.Client(api_key=api_key)
+    # --- CHANGE START ---
+    genai.configure(api_key=api_key)
+    model = genai.GenerativeModel('gemini-1.5-flash')
     
     prompt = f"""
     You are an expert utility engine that creates micro-cheatsheets.
     Take the following text and condense it down to the absolute minimum words.
-    
     Rules:
-    - Use heavy abbreviations, shorthand, and relational symbols (->, =, &).
-    - Remove all conversational filler and grammar.
-    - Format strictly using HTML definition lists: <dl> wrapper, <dt> for concept, <dd> for answer.
-    - Return ONLY valid inner HTML content. No markdown fences.
+    - Use heavy abbreviations, shorthand, and symbols (->, =, &).
+    - Remove filler and grammar.
+    - Format strictly using HTML: <dl> wrapper, <dt> for concept, <dd> for answer.
+    - Return ONLY valid inner HTML. No markdown.
     
     Source Material:
     {text[:12000]}
     """
     
     try:
-        response = client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=prompt,
-        )
+        response = model.generate_content(prompt)
         return response.text
+    # --- CHANGE END ---
     except Exception as e:
         print(f"AI Error: {e}", file=sys.stderr)
         sys.exit(1)
