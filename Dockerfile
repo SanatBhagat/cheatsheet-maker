@@ -4,9 +4,10 @@ FROM node:20-bullseye-slim
 # Set the environment variable Node needs to find Python during npm install
 ENV PYTHON=/usr/bin/python3
 
-# Install Python 3 and the necessary WeasyPrint graphics libraries
+# Install Python 3, Python headers, and the necessary WeasyPrint graphics libraries
 RUN apt-get update && apt-get install -y \
     python3 \
+    python3-dev \
     python3-pip \
     build-essential \
     libcairo2 \
